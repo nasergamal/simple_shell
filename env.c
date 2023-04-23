@@ -115,6 +115,11 @@ int _unsetenv(const char *name)
 		return (0);
 }
 
+/**
+ * _initenv - intiate environ for the program
+ *
+ * Return: void
+ */
 void _initenv(void)
 {
 	int i, n;
@@ -144,6 +149,11 @@ void _initenv(void)
 	environ = envi;
 }
 
+/**
+ * freeenv - free program environ
+ *
+ * Return: void
+ */
 void freeenv(void)
 {
 	int i = 0;

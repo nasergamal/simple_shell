@@ -21,7 +21,7 @@ int main(int ac __attribute__((unused)), char **av)
 	{
 		if (att)
 			_puts("($) ");
-		char_count = /*_tkline(&buf, &bsize);*/ getline(&buf, &bsize, stdin);
+		char_count = getline(&buf, &bsize, stdin);
 		if (char_count == -1)
 		{
 			printf("\n");
