@@ -144,7 +144,7 @@ void _initenv(void)
 			envi[i][n] = environ[i][n];
 		envi[i][n] = '\0';
 	}
-	envi[i] = '\0';
+	envi[i] = NULL;
 	envi[i + 1] = '\0';
 	environ = envi;
 }

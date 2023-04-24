@@ -10,6 +10,7 @@
 #include <string.h>
 
 extern char **environ;
+
 /**
  * struct buildin - struct containing builtins
  * @bld: builtin name
@@ -22,17 +23,18 @@ typedef struct buildin
 } build;
 
 /* main */
+void loop(char **av, char *buf);
 char **tokenize(char **av, char *buf, ssize_t char_count);
-char **sep(char **av);
+char **sep(char **av, int *status);
 
 /* shell_au */
 int is_cmd(char *cmd);
 char *check_cmd(char *cmd);
 void (*buildin(char **av))(char **av);
-void execute(char **argv);
+void execute(char **argv, int *status);
+
+/* free */
 void freeav(char **av);
-char **_realloc(char **ptr, int newsize);
-void _reallocenv(char **envir, int newsize);
 
 /* strings handling */
 int _strlen(char *str);
@@ -60,6 +62,12 @@ int _unsetenv(const char *name);
 void _initenv(void);
 void freeenv(void);
 
-/* notimplemented */
+/* separators */
+char *num_to_char(long int num);
+int logicalop(char **av, char *del, int *status, int mod);
+void conv(char **av, int i, int *status);
+int conv2(char **av, int *status, int n, int i);
+
+/* not implemented */
 ssize_t _tkline(char **lineptr, size_t *n);
 #endif

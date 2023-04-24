@@ -7,30 +7,45 @@
  *
  * Return: 1 on success
  */
-
 int main(int ac __attribute__((unused)), char **av)
 {
-	size_t bsize = 0;
-	int att = isatty(STDIN_FILENO);
-	void (*e)(char **);
-	ssize_t char_count;
 	char *buf = NULL;
 
-	_initenv();
+	_initenv(); /** create an environ for the program **/
+	loop(av, buf); /** shell loop **/
+	freeenv(); /** free created environ **/
+	return (0);
+}
+/**
+ * loop - shell loop
+ * @av: double pointer
+ * @buf: buffer for input
+ *
+ * Return: void
+ */
+void loop(char **av, char *buf)
+{
+	size_t bsize = 0;
+	int status = 0, att = isatty(STDIN_FILENO);
+	void (*e)(char **);
+	ssize_t char_count;
+	char **cav;
+
 	while (1)
 	{
-		if (att)
+		if (att) /** check mode (interactive or not) */
 			_puts("($) ");
 		char_count = getline(&buf, &bsize, stdin);
-		if (char_count == -1)
+		if (char_count == -1) /* EOF */
 		{
 			printf("\n");
 			break; }
-		else if (char_count == 1)
+		else if (char_count == 1) /* empty line*/
 			continue;
-		else
+		else /* normal input */
 			av = tokenize(av, buf, char_count);
-		if (char_count > 1)
+		cav = av;
+		if (char_count > 1) /* check for builtins */
 		{
 			e = buildin(av);
 			if (e)
@@ -39,17 +54,16 @@ int main(int ac __attribute__((unused)), char **av)
 					free(buf);
 				e(av);
 				continue; }
-		} sep(av);
-		if (!(is_cmd(av[0])))
-			av[0] = check_cmd(av[0]);
-		execute(av);
+		} cav = sep(cav, &status); /* check for separator and execute based on it */
+		if (!(is_cmd(cav[0]))) /* check if argument is cmd else check in $PATH*/
+			cav[0] = check_cmd(cav[0]);
+		execute(cav, &status);
 		if (av && *av)
 			freeav(av);
-		if (!att)
+		if (!att) /* break if non-interactive*/
 			break;
 	}
-	freeenv(), free(buf);
-	return (0);
+	free(buf);
 }
 
 /**
@@ -102,27 +116,42 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 /**
  * sep - look for separators
  * @av: pointer to an array
+ * @status: last execution status
  *
  * Return: av
  */
 
-char **sep(char **av)
+char **sep(char **av, int *status)
 {
-	int i;
-	char **av2;
+	int i, n = 0;
 
 	for (i = 0; av[i]; i++)
 	{
 		if (_strcmp(av[i], ";"))
 		{
-			av2 = av;
-			av += (i + 1);
-			av2[i] = NULL;
-			if (!(is_cmd(av2[0])))
-				av2[0] = check_cmd(av2[0]);
-			execute(av2);
-			i = 0;
-		}
+			n = conv2(av, status, n, i); }
+		else if (_strcmp(av[i], "#"))
+		{
+			free(av[i]), av[i] = '\0';
+			for (i += 1; av[i] ; i++)
+				free(av[i]);
+			break; }
+		else if (_strcmp(av[i], "$") && !(av[i][1]))
+			continue;
+		else if (_strcmp(av[i], "$$") || (_strcmp(av[i], "$?")))
+		{
+			conv(av, i, status); }
+		else if (_strcmp(av[i], "$") && av[i][1])
+		{
+			conv(av, i, status); }
+		else if (_strcmp(av[i], "&&") && av[i + 1])
+		{
+			n = logicalop(av, "&&", status, 0);
+			break; }
+		else if (_strcmp(av[i], "||") && av[i + 1])
+		{
+			n = logicalop(av, "||", status, 1);
+			break; }
 	}
-	return (av);
+	return (av + n);
 }

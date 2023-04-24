@@ -3,20 +3,25 @@
 /**
  * execute - excute cmd with argument argv
  * @argv: pointer to array
+ * @status: child pid excution status
  *
  * Return: void
  */
 
-void execute(char **argv)
+void execute(char **argv, int *status)
 {
-	int status;
 	pid_t pid;
 
+	if (!argv || !argv[0])
+	{
+		return;
+	}
 	if  (is_cmd(argv[0]))
 		pid = fork();
 	else
 	{
 		print_err(argv, ": not found\n");
+		*status = 98;
 		return;
 	}
 	if (pid == 0)
@@ -29,7 +34,9 @@ void execute(char **argv)
 		}
 	}
 	else
-		wait(&status);
+		wait(status);
+	if (WIFEXITED(*status))
+		*status = WEXITSTATUS(*status);
 }
 
 /**
