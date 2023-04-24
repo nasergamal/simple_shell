@@ -42,6 +42,7 @@ int logicalop(char **av, char *del, int *status, int mod)
 	char **av2, *li;
 	int i, n = 0;
 
+	*status = 0;
 	if (mod)
 		*status = 1;
 	for (i = 0; av[i]; i++)
@@ -75,7 +76,6 @@ int logicalop(char **av, char *del, int *status, int mod)
 
 		}
 	}
-	*status = 0;
 	return (n);
 }
 /**
