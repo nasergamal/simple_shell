@@ -38,7 +38,7 @@ void loop(char **av, char *buf)
 		char_count = getline(&buf, &bsize, stdin);
 		if (char_count == -1) /* EOF */
 		{
-			printf("\n");
+			_puts("\n");
 			break; }
 		else if (char_count == 1) /* empty line*/
 			continue;
