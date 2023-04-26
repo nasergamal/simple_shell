@@ -16,7 +16,7 @@ void execute(char **argv, int *status)
 	{
 		return;
 	}
-	if  (is_cmd(argv[0]) && (access(argv[0], F_OK) == 0))
+	if  (is_cmd(argv[0]) && (access(argv[0], F_OK && X_OK) == 0))
 		pid = fork();
 	else
 	{
@@ -97,7 +97,7 @@ int is_cmd(char *cmd)
 	{
 		return (0);
 	}
-	else if (stat(cmd, &st) == 0)
+	else if (st.st_mode & S_IFREG)
 		return (1);
 	return (0);
 }

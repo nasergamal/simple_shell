@@ -38,8 +38,7 @@ void loop(char **av, char *buf)
 			_puts("($) ");
 		char_count = getline(&buf, &bsize, stdin);
 		if (char_count == -1 && att) /* EOF */
-		{
-			_puts("\n");
+		{	_puts("\n");
 			break; }
 		else if (char_count == -1)
 		{	break; }
@@ -54,7 +53,7 @@ void loop(char **av, char *buf)
 			if (e)
 			{
 				if (_strcmp(av[0], "exit"))
-					free(buf);
+				{	free(buf), buf = NULL; }
 				e(av);
 				continue; }
 		} cav = sep(cav, &status); /* check for separator and execute based on it */
@@ -63,7 +62,9 @@ void loop(char **av, char *buf)
 		execute(cav, &status);
 		if (av && *av)
 			freeav(av);
-	} free(buf);
+	}
+	if (buf != NULL)
+		free(buf);
 }
 
 /**

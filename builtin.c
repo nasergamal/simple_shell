@@ -18,14 +18,15 @@ void exitf(char **av)
 			print_err(av, ": Illegal number: ");
 			_errputs(av[1]);
 			_errputs("\n");
+			freeav(av);
 			return;
 		}
-		freeenv();
 		freeav(av);
+		freeenv();
 		exit(n);
 	}
-	freeenv();
 	freeav(av);
+	freeenv();
 	exit(0);
 }
 /**
