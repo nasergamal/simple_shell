@@ -42,12 +42,12 @@ void loop(char **av, char *buf)
 			break; }
 		else if (char_count == -1)
 			break;
-		else if (char_count == 1) /* empty line*/
-			continue;
 		else /* normal input */
 			av = tokenize(av, buf, char_count);
-		cav = av;
-		if (char_count > 1) /* check for builtins */
+		if (!av || !av[0])
+		{	freeav(av);
+			continue; }
+		cav = av; if (char_count > 1) /* check for builtins */
 		{
 			e = buildin(av);
 			if (e)
@@ -62,8 +62,7 @@ void loop(char **av, char *buf)
 		execute(cav, &status);
 		if (av && *av)
 			freeav(av);
-	}
-	free(buf);
+	} free(buf);
 }
 
 /**
