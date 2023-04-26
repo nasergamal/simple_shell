@@ -52,6 +52,7 @@ int _atoi(char *s);
 /* builtin */
 void exitf(char **av);
 void cdir(char **av);
+void menv(char **av);
 void msenv(char **av);
 void uenv(char **av);
 

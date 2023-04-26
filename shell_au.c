@@ -113,6 +113,7 @@ void (*buildin(char **av))(char **av)
 	build b[] = {
 		{"exit", exitf},
 		{"cd", cdir},
+		{"env", menv},
 		{"setenv", msenv},
 		{"unsetenv", uenv},
 		{NULL, NULL}

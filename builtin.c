@@ -62,6 +62,21 @@ void cdir(char **av)
 		freeav(av);
 }
 /**
+ * menv - print enviorn
+ * @av: double pointer
+ *
+ * Return: void
+ */
+void menv(char **av)
+{
+	int i;
+
+	for (i = 0; environ[i]; i++)
+		puts(environ[i]);
+	if (av && *av)
+		freeav(av);
+}
+/**
  * msenv - set environment builtin
  * @av: array
  *
