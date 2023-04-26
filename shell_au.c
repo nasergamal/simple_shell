@@ -30,7 +30,7 @@ void execute(char **argv, int *status)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
-			perror(getenv("_"));
+			print_err(argv, ": No such file or directory");
 			freeav(argv);
 			exit(98);
 		}
@@ -49,44 +49,36 @@ void execute(char **argv, int *status)
  */
 char *check_cmd(char *cmd)
 {
-	char *path = _getenv("PATH"), *cpath2;
-	int cp = 0, sp = 0, n;
+	char *path = _getenv("PATH"), *cpath2, *pathtok, *pathcpy;
+	int pathlen, cmdlen;
 
-	if (!path || _strlen(path) == 0)
+	if (!path || _strlen(path) == 0 || !cmd)
 		return (cmd);
-	if (_strcmp(cmd, "./"))
-		return (cmd);
-
-	while (1)
+	cmdlen = _strlen(cmd);
+	pathcpy = _strdup(path);
+	pathtok = strtok(pathcpy, ":");
+	while (pathtok != NULL)
 	{
-		if (!path[cp] || path[cp] == ':')
+		pathlen = _strlen(pathtok);
+		cpath2 = malloc(sizeof(char) * (cmdlen + pathlen + 2));
+		_strcpy(cpath2, pathtok);
+		_strcat(cpath2, "/");
+		_strcat(cpath2, cmd);
+		_strcat(cpath2, "\0");
+		if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
 		{
-			cpath2 = malloc(sizeof(char) * (cp - sp + _strlen(cmd) + 2));
-			if (cpath2 == NULL)
-				return (cmd);
-			for (n = 0; sp < cp; sp++)
-				if (path[sp] != ':')
-					cpath2[n++] = path[sp];
-			cpath2[n] = '\0';
-			if (!cpath2)
-				_strcat(cpath2, cmd);
-			else
-			{
-				_strcat(cpath2, "/");
-				_strcat(cpath2, cmd); }
-			if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
-			{
-				free(cmd);
-				return (cpath2);
-			}
+			free(pathcpy);
+			free(cmd);
+			return (cpath2);
+		}
+		else
+		{
 			free(cpath2);
-			if (!path[cp])
-				break;
-			sp = cp;
-			} cp++;
+			pathtok = strtok(NULL, ":");
+		}
 	}
+	free(pathcpy);
 	return (cmd);
-
 }
 /**
  * is_cmd - check if cmd exist

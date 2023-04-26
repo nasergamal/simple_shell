@@ -10,11 +10,12 @@
 int main(int ac __attribute__((unused)), char **av)
 {
 	char *buf = NULL;
+	int st = 0;
 
 	_initenv(); /** create an environ for the program **/
-	loop(av, buf); /** shell loop **/
+	st = loop(av, buf); /** shell loop **/
 	freeenv(); /** free created environ **/
-	return (0);
+	return (st);
 }
 /**
  * loop - shell loop
@@ -23,7 +24,7 @@ int main(int ac __attribute__((unused)), char **av)
  *
  * Return: void
  */
-void loop(char **av, char *buf)
+int loop(char **av, char *buf)
 {
 	size_t bsize = 0;
 	int status = 0, att = isatty(STDIN_FILENO);
@@ -54,7 +55,7 @@ void loop(char **av, char *buf)
 				{	free(buf), buf = NULL, freeenv(), freeav(av);
 					exit(status); }
 				if (_strcmp(av[0], "exit") && av[1])
-					free(buf), buf = NULL;
+					free(buf), buf = NULL, status = 2;
 				e(av);
 				continue; }
 		cav = sep(cav, &status); /* check for separator and execute based on it */
@@ -62,10 +63,10 @@ void loop(char **av, char *buf)
 			cav[0] = check_cmd(cav[0]);
 		execute(cav, &status);
 		if (av && *av)
-			freeav(av);
-	}
+			freeav(av); }
 	if (buf != NULL)
-		free(buf); }
+		free(buf);
+	return (status); }
 
 /**
  * tokenize - tokenize inputs and add tokens to an array
@@ -85,7 +86,7 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 	bufc = malloc(sizeof(char) * (char_count + 1));
 	if (bufc == NULL)
 	{
-		perror("memory allocation error");
+		perror("failed to allocate memory");
 		return (NULL);
 	}
 	_strcpy(bufc, buf);
@@ -100,7 +101,7 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 	av = malloc(sizeof(char *) * tokenc);
 	if (av == NULL)
 	{
-		perror("memory allocation error");
+		perror("failed to allocate memory");
 		return (NULL);
 
 	}

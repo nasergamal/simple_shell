@@ -43,7 +43,14 @@ void cdir(char **av)
 	}
 	else if (_strcmp(av[1], "-"))
 	{
-		i = chdir(_getenv("OLDPWD"));
+		if (_getenv("OLDPWD") != NULL)
+		{	i = chdir(_getenv("OLDPWD"));
+			_puts(_getenv("OLDPWD"));
+			_puts("\n"); }
+		else
+		{ _puts(_getenv("PWD"));
+			_puts("\n"); }
+
 	}
 	else
 		i = chdir(av[1]);
