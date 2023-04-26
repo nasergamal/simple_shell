@@ -40,6 +40,8 @@ void loop(char **av, char *buf)
 		{
 			_puts("\n");
 			break; }
+		else if (char_count == -1)
+			break;
 		else if (char_count == 1) /* empty line*/
 			continue;
 		else /* normal input */
