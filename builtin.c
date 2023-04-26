@@ -10,16 +10,21 @@ void exitf(char **av)
 {
 	int i, n;
 
-	freeenv();
 	if (av[1])
 	{
 		n = _atoi(av[1]);
-		if (n)
+		if (n == 0)
 		{
-			freeav(av);
-			exit(n);
+			n = 2;
+			print_err(av, ": Illegal number: ");
+			_errputs(av[1]);
+			_errputs("\n");
 		}
+		freeenv();
+		freeav(av);
+		exit(n);
 	}
+	freeenv();
 	for (i = 0; av[i]; i++)
 	{
 		free(av[i]);

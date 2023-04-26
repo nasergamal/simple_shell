@@ -28,15 +28,15 @@ void loop(char **av, char *buf)
 	size_t bsize = 0;
 	int status = 0, att = isatty(STDIN_FILENO);
 	void (*e)(char **);
-	ssize_t char_count;
+	ssize_t char_count = 0;
 	char **cav;
 
-	while (1)
+	while (char_count != EOF)
 	{
 		if (att) /** check mode (interactive or not) */
 			_puts("($) ");
 		char_count = getline(&buf, &bsize, stdin);
-		if (char_count == -1) /* EOF */
+		if (char_count == -1 && att) /* EOF */
 		{
 			_puts("\n");
 			break; }
@@ -60,8 +60,6 @@ void loop(char **av, char *buf)
 		execute(cav, &status);
 		if (av && *av)
 			freeav(av);
-		if (!att) /* break if non-interactive*/
-			break;
 	}
 	free(buf);
 }
@@ -79,7 +77,7 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 	size_t tokenc = 0;
 	int i;
 	char *bufc = NULL, *token;
-	const char *d = " \n";
+	const char *d = " \t\n";
 
 	bufc = malloc(sizeof(char) * (char_count + 1));
 	if (bufc == NULL)
