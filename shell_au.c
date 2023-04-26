@@ -47,13 +47,12 @@ void execute(char **argv, int *status)
  */
 char *check_cmd(char *cmd)
 {
-	char *path, *cpath2, *pathtok, *pathcpy;
+	char *path = _getenv("PATH"), *cpath2, *pathtok, *pathcpy;
 	int pathlen, cmdlen;
 
-	if (!cmd)
-		return (NULL);
+	if (!path || _strlen(path) == 0)
+		return (cmd);
 	cmdlen = _strlen(cmd);
-	path = _getenv("PATH");
 	pathcpy = _strdup(path);
 	pathtok = strtok(pathcpy, ":");
 
@@ -64,8 +63,7 @@ char *check_cmd(char *cmd)
 		_strcpy(cpath2, pathtok);
 		_strcat(cpath2, "/");
 		_strcat(cpath2, cmd);
-		_strcat(cpath2, "\0");
-		if ((is_cmd(cpath2)))
+		if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
 		{
 			free(pathcpy);
 			free(cmd);

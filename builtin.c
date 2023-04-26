@@ -8,28 +8,24 @@
  */
 void exitf(char **av)
 {
-	int i, n;
+	int n;
 
 	if (av[1])
 	{
 		n = _atoi(av[1]);
 		if (n == 0)
 		{
-			n = 2;
 			print_err(av, ": Illegal number: ");
 			_errputs(av[1]);
 			_errputs("\n");
+			return;
 		}
 		freeenv();
 		freeav(av);
 		exit(n);
 	}
 	freeenv();
-	for (i = 0; av[i]; i++)
-	{
-		free(av[i]);
-	}
-	free(av);
+	freeav(av);
 	exit(0);
 }
 /**
