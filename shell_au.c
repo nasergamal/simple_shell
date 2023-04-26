@@ -16,7 +16,7 @@ void execute(char **argv, int *status)
 	{
 		return;
 	}
-	if  (is_cmd(argv[0]) && (access(argv[0], F_OK && X_OK) == 0))
+	if  (is_cmd(argv[0]) && (access(argv[0], F_OK) == 0))
 		pid = fork();
 	else
 	{
@@ -24,7 +24,9 @@ void execute(char **argv, int *status)
 		*status = 98;
 		return;
 	}
-	if (pid == 0)
+	if (pid == -1)
+	{	*status = 1, print_err(argv, ": failed to fork\n"); }
+	else if (pid == 0)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
