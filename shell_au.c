@@ -21,7 +21,7 @@ void execute(char **argv, int *status)
 	else
 	{
 		print_err(argv, ": not found\n");
-		*status = 98;
+		*status = 127;
 		return;
 	}
 	if (pid == -1)
@@ -49,42 +49,45 @@ void execute(char **argv, int *status)
  */
 char *check_cmd(char *cmd)
 {
-	char *path = _getenv("PATH"), *cpath2, *pathtok, *pathcpy;
-	int pathlen, cmdlen;
+	char *path = _getenv("PATH"), *cpath2;
+	int cp = 0, sp = 0, n;
 
 	if (!path || _strlen(path) == 0)
 		return (cmd);
 	if (_strcmp(cmd, "./"))
 		return (cmd);
-	cmdlen = _strlen(cmd);
-	pathcpy = _strdup(path);
-	pathtok = strtok(pathcpy, ":");
 
-	while (pathtok != NULL)
+	while (1)
 	{
-		pathlen = _strlen(pathtok);
-		cpath2 = malloc(sizeof(char) * (cmdlen + pathlen + 2));
-		_strcpy(cpath2, pathtok);
-		_strcat(cpath2, "/");
-		_strcat(cpath2, cmd);
-		_strcat(cpath2, "\0");
-		if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
+		if (!path[cp] || path[cp] == ':')
 		{
-			free(pathcpy);
-			free(cmd);
-			return (cpath2);
-		}
-		else
-		{
+			cpath2 = malloc(sizeof(char) * (cp - sp + _strlen(cmd) + 2));
+			if (cpath2 == NULL)
+				return (cmd);
+			for (n = 0; sp < cp; sp++)
+				if (path[sp] != ':')
+					cpath2[n++] = path[sp];
+			cpath2[n] = '\0';
+			if (!cpath2)
+				_strcat(cpath2, cmd);
+			else
+			{
+				_strcat(cpath2, "/");
+				_strcat(cpath2, cmd); }
+			if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
+			{
+				free(cmd);
+				return (cpath2);
+			}
 			free(cpath2);
-			pathtok = strtok(NULL, ":");
-		}
+			if (!path[cp])
+				break;
+			sp = cp;
+			} cp++;
 	}
-	free(pathcpy);
 	return (cmd);
 
 }
-
 /**
  * is_cmd - check if cmd exist
  * @cmd: command

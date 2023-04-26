@@ -47,16 +47,17 @@ void loop(char **av, char *buf)
 		if (!av || !av[0])
 		{	freeav(av);
 			continue; }
-		cav = av; if (char_count > 1) /* check for builtins */
+		cav = av, e = buildin(av); /* check for builtins */
+		if (e)
 		{
-			e = buildin(av);
-			if (e)
-			{
-				if (_strcmp(av[0], "exit"))
-				{	free(buf), buf = NULL; }
+			if ((_strcmp(av[0], "exit") && !(av[1])))
+				{	free(buf), buf = NULL, freeenv(), freeav(av);
+					exit(status); }
+				if (_strcmp(av[0], "exit") && av[1])
+					free(buf), buf = NULL;
 				e(av);
 				continue; }
-		} cav = sep(cav, &status); /* check for separator and execute based on it */
+		cav = sep(cav, &status); /* check for separator and execute based on it */
 		if (!(is_cmd(cav[0]))) /* check if argument is cmd else check in $PATH*/
 			cav[0] = check_cmd(cav[0]);
 		execute(cav, &status);
@@ -64,8 +65,7 @@ void loop(char **av, char *buf)
 			freeav(av);
 	}
 	if (buf != NULL)
-		free(buf);
-}
+		free(buf); }
 
 /**
  * tokenize - tokenize inputs and add tokens to an array

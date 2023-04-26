@@ -25,9 +25,6 @@ void exitf(char **av)
 		freeenv();
 		exit(n);
 	}
-	freeav(av);
-	freeenv();
-	exit(0);
 }
 /**
  * cdir - change directory builtin function
