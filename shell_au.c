@@ -16,15 +16,17 @@ void execute(char **argv, int *status)
 	{
 		return;
 	}
-	if  (is_cmd(argv[0]))
+	if  (is_cmd(argv[0]) && (access(argv[0], F_OK) == 0))
 		pid = fork();
 	else
 	{
 		print_err(argv, ": not found\n");
-		*status = 98;
+		*status = 127;
 		return;
 	}
-	if (pid == 0)
+	if (pid == -1)
+	{	*status = 1, print_err(argv, ": failed to fork\n"); }
+	else if (pid == 0)
 	{
 		if (execve(argv[0], argv, environ) == -1)
 		{
@@ -47,41 +49,45 @@ void execute(char **argv, int *status)
  */
 char *check_cmd(char *cmd)
 {
-	char *path, *cpath2, *pathtok, *pathcpy;
-	int pathlen, cmdlen;
+	char *path = _getenv("PATH"), *cpath2;
+	int cp = 0, sp = 0, n;
 
-	if (!cmd)
-		return (NULL);
-	cmdlen = _strlen(cmd);
-	path = _getenv("PATH");
-	pathcpy = _strdup(path);
-	pathtok = strtok(pathcpy, ":");
+	if (!path || _strlen(path) == 0)
+		return (cmd);
+	if (_strcmp(cmd, "./"))
+		return (cmd);
 
-	while (pathtok != NULL)
+	while (1)
 	{
-		pathlen = _strlen(pathtok);
-		cpath2 = malloc(sizeof(char) * (cmdlen + pathlen + 2));
-		_strcpy(cpath2, pathtok);
-		_strcat(cpath2, "/");
-		_strcat(cpath2, cmd);
-		_strcat(cpath2, "\0");
-		if ((is_cmd(cpath2)))
+		if (!path[cp] || path[cp] == ':')
 		{
-			free(pathcpy);
-			free(cmd);
-			return (cpath2);
-		}
-		else
-		{
+			cpath2 = malloc(sizeof(char) * (cp - sp + _strlen(cmd) + 2));
+			if (cpath2 == NULL)
+				return (cmd);
+			for (n = 0; sp < cp; sp++)
+				if (path[sp] != ':')
+					cpath2[n++] = path[sp];
+			cpath2[n] = '\0';
+			if (!cpath2)
+				_strcat(cpath2, cmd);
+			else
+			{
+				_strcat(cpath2, "/");
+				_strcat(cpath2, cmd); }
+			if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
+			{
+				free(cmd);
+				return (cpath2);
+			}
 			free(cpath2);
-			pathtok = strtok(NULL, ":");
-		}
+			if (!path[cp])
+				break;
+			sp = cp;
+			} cp++;
 	}
-	free(pathcpy);
 	return (cmd);
 
 }
-
 /**
  * is_cmd - check if cmd exist
  * @cmd: command
@@ -96,7 +102,7 @@ int is_cmd(char *cmd)
 	{
 		return (0);
 	}
-	else if (stat(cmd, &st) == 0)
+	else if (st.st_mode & S_IFREG)
 		return (1);
 	return (0);
 }
@@ -114,6 +120,7 @@ void (*buildin(char **av))(char **av)
 	build b[] = {
 		{"exit", exitf},
 		{"cd", cdir},
+		{"env", menv},
 		{"setenv", msenv},
 		{"unsetenv", uenv},
 		{NULL, NULL}
@@ -129,7 +136,7 @@ void (*buildin(char **av))(char **av)
 			}
 		}
 
-		if (!(b[i].bld[n]))
+		if (!(b[i].bld[n]) && !(av[0][n]))
 			return (b[i].func);
 	}
 	return (0);

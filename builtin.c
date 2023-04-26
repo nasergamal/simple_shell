@@ -8,24 +8,23 @@
  */
 void exitf(char **av)
 {
-	int i, n;
+	int n;
 
-	freeenv();
 	if (av[1])
 	{
 		n = _atoi(av[1]);
-		if (n)
+		if (n == 0)
 		{
+			print_err(av, ": Illegal number: ");
+			_errputs(av[1]);
+			_errputs("\n");
 			freeav(av);
-			exit(n);
+			return;
 		}
+		freeav(av);
+		freeenv();
+		exit(n);
 	}
-	for (i = 0; av[i]; i++)
-	{
-		free(av[i]);
-	}
-	free(av);
-	exit(0);
 }
 /**
  * cdir - change directory builtin function
@@ -57,6 +56,21 @@ void cdir(char **av)
 		_setenv("OLDPWD", _getenv("PWD"), 1);
 		_setenv("PWD", getcwd(cwd, 1024), 1);
 	}
+	if (av && *av)
+		freeav(av);
+}
+/**
+ * menv - print enviorn
+ * @av: double pointer
+ *
+ * Return: void
+ */
+void menv(char **av)
+{
+	int i;
+
+	for (i = 0; environ[i]; i++)
+		puts(environ[i]);
 	if (av && *av)
 		freeav(av);
 }

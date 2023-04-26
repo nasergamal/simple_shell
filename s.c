@@ -28,43 +28,44 @@ void loop(char **av, char *buf)
 	size_t bsize = 0;
 	int status = 0, att = isatty(STDIN_FILENO);
 	void (*e)(char **);
-	ssize_t char_count;
+	ssize_t char_count = 0;
 	char **cav;
 
-	while (1)
+	signal(SIGINT, sighand);
+	while (char_count != EOF)
 	{
 		if (att) /** check mode (interactive or not) */
 			_puts("($) ");
 		char_count = getline(&buf, &bsize, stdin);
-		if (char_count == -1) /* EOF */
-		{
-			_puts("\n");
+		if (char_count == -1 && att) /* EOF */
+		{	_puts("\n");
 			break; }
-		else if (char_count == 1) /* empty line*/
-			continue;
+		else if (char_count == -1)
+		{	break; }
 		else /* normal input */
 			av = tokenize(av, buf, char_count);
-		cav = av;
-		if (char_count > 1) /* check for builtins */
+		if (!av || !av[0])
+		{	freeav(av);
+			continue; }
+		cav = av, e = buildin(av); /* check for builtins */
+		if (e)
 		{
-			e = buildin(av);
-			if (e)
-			{
-				if (_strcmp(av[0], "exit"))
-					free(buf);
+			if ((_strcmp(av[0], "exit") && !(av[1])))
+				{	free(buf), buf = NULL, freeenv(), freeav(av);
+					exit(status); }
+				if (_strcmp(av[0], "exit") && av[1])
+					free(buf), buf = NULL;
 				e(av);
 				continue; }
-		} cav = sep(cav, &status); /* check for separator and execute based on it */
+		cav = sep(cav, &status); /* check for separator and execute based on it */
 		if (!(is_cmd(cav[0]))) /* check if argument is cmd else check in $PATH*/
 			cav[0] = check_cmd(cav[0]);
 		execute(cav, &status);
 		if (av && *av)
 			freeav(av);
-		if (!att) /* break if non-interactive*/
-			break;
 	}
-	free(buf);
-}
+	if (buf != NULL)
+		free(buf); }
 
 /**
  * tokenize - tokenize inputs and add tokens to an array
@@ -79,7 +80,7 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 	size_t tokenc = 0;
 	int i;
 	char *bufc = NULL, *token;
-	const char *d = " \n";
+	const char *d = " \t\n";
 
 	bufc = malloc(sizeof(char) * (char_count + 1));
 	if (bufc == NULL)
@@ -154,4 +155,14 @@ char **sep(char **av, int *status)
 			break; }
 	}
 	return (av + n);
+}
+/**
+ * sighand - handle signals
+ * @sig_num: not used
+ *
+ * Return: void
+ */
+void sighand(int sig_num __attribute__((unused)))
+{
+	_puts("\n($) ");
 }

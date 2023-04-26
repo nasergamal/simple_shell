@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
-
+#include <signal.h>
 extern char **environ;
 
 /**
@@ -26,7 +26,7 @@ typedef struct buildin
 void loop(char **av, char *buf);
 char **tokenize(char **av, char *buf, ssize_t char_count);
 char **sep(char **av, int *status);
-
+void sighand(int sig_num __attribute__((unused)));
 /* shell_au */
 int is_cmd(char *cmd);
 char *check_cmd(char *cmd);
@@ -52,6 +52,7 @@ int _atoi(char *s);
 /* builtin */
 void exitf(char **av);
 void cdir(char **av);
+void menv(char **av);
 void msenv(char **av);
 void uenv(char **av);
 
