@@ -31,6 +31,7 @@ void loop(char **av, char *buf)
 	ssize_t char_count = 0;
 	char **cav;
 
+	signal(SIGINT, sighand);
 	while (char_count != EOF)
 	{
 		if (att) /** check mode (interactive or not) */
@@ -41,7 +42,7 @@ void loop(char **av, char *buf)
 			_puts("\n");
 			break; }
 		else if (char_count == -1)
-			break;
+		{	break; }
 		else /* normal input */
 			av = tokenize(av, buf, char_count);
 		if (!av || !av[0])
@@ -153,4 +154,14 @@ char **sep(char **av, int *status)
 			break; }
 	}
 	return (av + n);
+}
+/**
+ * sighand - handle signals
+ * @sig_num: not used
+ *
+ * Return: void
+ */
+void sighand(int sig_num __attribute__((unused)))
+{
+	_puts("\n($) ");
 }
