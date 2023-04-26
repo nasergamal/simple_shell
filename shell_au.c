@@ -63,6 +63,7 @@ char *check_cmd(char *cmd)
 		_strcpy(cpath2, pathtok);
 		_strcat(cpath2, "/");
 		_strcat(cpath2, cmd);
+		_strcat(cpath2, "\0");
 		if ((is_cmd(cpath2) && (access(cpath2, F_OK) == 0)))
 		{
 			free(pathcpy);
