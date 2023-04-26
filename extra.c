@@ -52,8 +52,6 @@ int logicalop(char **av, char *del, int *status, int mod)
 			av2 = &av[n], n = i + 1, li = av[i], av[i] = NULL;
 			if ((!(*status) && !(mod)) || ((*status) && (mod)))
 			{
-				if (!(is_cmd(av2[0])))
-					av2[0] = check_cmd(av2[0]);
 				execute(av2, status); }
 			if (!(av[i]) && av[i + 1])
 				av[i] = li;
@@ -69,8 +67,6 @@ int logicalop(char **av, char *del, int *status, int mod)
 				if ((!(*status) && !mod) || ((*status) && (mod)))
 				{
 					av2 = &av[n], n = i + 1;
-					if (!(is_cmd(av2[0])))
-						av2[0] = check_cmd(av2[0]);
 					execute(av2, status); }
 			}
 
@@ -143,8 +139,6 @@ int conv2(char **av, int *status, int n, int i)
 	char **av2, *li, *cmd;
 
 	av2 = &av[n], n = i + 1, li = av[i], av[i] = NULL;
-		if (!(is_cmd(av2[0])))
-			av2[0] = check_cmd(av2[0]);
 	execute(av2, status), av[i] = li;
 
 	if (!av[i + 1] && av[i][1])

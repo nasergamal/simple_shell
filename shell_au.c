@@ -10,17 +10,22 @@
 
 void execute(char **argv, int *status)
 {
+	char *cmd;
 	pid_t pid;
 
-	if (!argv || !argv[0])
+	cmd = _strdup(argv[0]);
+	if (!argv || !argv[0] || !cmd)
 	{
 		return;
 	}
-	if  (is_cmd(argv[0]) && (access(argv[0], F_OK) == 0))
+	if (!(is_cmd(cmd))) /* check if argument is cmd else check in $PATH*/
+		cmd = check_cmd(cmd);
+	if  (is_cmd(cmd) && (access(cmd, F_OK) == 0))
 		pid = fork();
 	else
 	{
 		print_err(argv, ": not found\n");
+		free(cmd);
 		*status = 127;
 		return;
 	}
@@ -28,9 +33,10 @@ void execute(char **argv, int *status)
 	{	*status = 1, print_err(argv, ": failed to fork\n"); }
 	else if (pid == 0)
 	{
-		if (execve(argv[0], argv, environ) == -1)
+		if (execve(cmd, argv, environ) == -1)
 		{
 			print_err(argv, ": No such file or directory");
+			free(cmd);
 			freeav(argv);
 			exit(98);
 		}
@@ -39,6 +45,7 @@ void execute(char **argv, int *status)
 		wait(status);
 	if (WIFEXITED(*status))
 		*status = WEXITSTATUS(*status);
+	free(cmd);
 }
 
 /**

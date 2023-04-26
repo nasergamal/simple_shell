@@ -41,7 +41,7 @@ int _puts(char *str)
  */
 void print_err(char **av, char *err)
 {
-	_errputs(getenv("_"));
+	_errputs(_getenv("_"));
 	_errputs(": ");
 	_errputs("1"); /* line counter needed*/
 	_errputs(": ");

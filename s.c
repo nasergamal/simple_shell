@@ -59,8 +59,6 @@ int loop(char **av, char *buf)
 				e(av);
 				continue; }
 		cav = sep(cav, &status); /* check for separator and execute based on it */
-		if (!(is_cmd(cav[0]))) /* check if argument is cmd else check in $PATH*/
-			cav[0] = check_cmd(cav[0]);
 		execute(cav, &status);
 		if (av && *av)
 			freeav(av); }

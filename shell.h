@@ -27,6 +27,7 @@ int loop(char **av, char *buf);
 char **tokenize(char **av, char *buf, ssize_t char_count);
 char **sep(char **av, int *status);
 void sighand(int sig_num __attribute__((unused)));
+
 /* shell_au */
 int is_cmd(char *cmd);
 char *check_cmd(char *cmd);
