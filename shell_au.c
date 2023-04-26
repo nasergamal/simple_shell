@@ -52,6 +52,8 @@ char *check_cmd(char *cmd)
 
 	if (!path || _strlen(path) == 0)
 		return (cmd);
+	if (_strcmp(cmd, "./"))
+		return (cmd);
 	cmdlen = _strlen(cmd);
 	pathcpy = _strdup(path);
 	pathtok = strtok(pathcpy, ":");
@@ -129,7 +131,7 @@ void (*buildin(char **av))(char **av)
 			}
 		}
 
-		if (!(b[i].bld[n]))
+		if (!(b[i].bld[n]) && !(av[0][n]))
 			return (b[i].func);
 	}
 	return (0);
