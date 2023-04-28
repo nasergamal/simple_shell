@@ -36,12 +36,13 @@ int _puts(char *str)
  * print_err - print errormsg
  * @av: array
  * @err: error msg
+ * @s: struct with filename and status
  *
  * Return: void
  */
-void print_err(char **av, char *err)
+void print_err(char **av, char *err, st *s)
 {
-	_errputs(_getenv("_"));
+	_errputs(s->fname);
 	_errputs(": ");
 	_errputs("1"); /* line counter needed*/
 	_errputs(": ");

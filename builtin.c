@@ -3,19 +3,20 @@
 /**
  * exitf - exit builtin function
  * @av: pointer to array
+ * @s: struct with filename and status
  *
  * Return: void
  */
-void exitf(char **av)
+void exitf(char **av, st * s __attribute__((unused)))
 {
 	int n;
 
 	if (av[1])
 	{
 		n = _atoi(av[1]);
-		if (n == 0)
+		if (n <= 0)
 		{
-			print_err(av, ": Illegal number: ");
+			print_err(av, ": Illegal number: ", s);
 			_errputs(av[1]);
 			_errputs("\n");
 			freeav(av);
@@ -29,10 +30,11 @@ void exitf(char **av)
 /**
  * cdir - change directory builtin function
  * @av: pointer to array
+ * @s: struct with filename and status
  *
  * Return: void
  */
-void cdir(char **av)
+void cdir(char **av, st *s)
 {
 	int i = 1;
 	char cwd[1024];
@@ -56,7 +58,7 @@ void cdir(char **av)
 		i = chdir(av[1]);
 	if (i == -1)
 	{
-		print_err(av, ": No such file or directory\n");
+		print_err(av, ": No such file or directory\n", s);
 	}
 	else
 	{
@@ -69,10 +71,11 @@ void cdir(char **av)
 /**
  * menv - print enviorn
  * @av: double pointer
+ * @s: struct with filename and status
  *
  * Return: void
  */
-void menv(char **av)
+void menv(char **av, st *s __attribute__ ((unused)))
 {
 	int i;
 
@@ -84,16 +87,17 @@ void menv(char **av)
 /**
  * msenv - set environment builtin
  * @av: array
+ * @s: struct with filename and status
  *
  * Return: void
  */
 
-void msenv(char **av)
+void msenv(char **av, st *s)
 {
 	if (!(av) || !av[1] || !av[2] || av[3])
-		print_err(av, ": Wrong number of argument\n");
+		print_err(av, ": Wrong number of argument\n", s);
 	else if (_setenv(av[1], av[2], 1) == 0)
-		print_err(av, ": failed to set envirioment\n");
+		print_err(av, ": failed to set envirioment\n", s);
 	if (av && *av)
 		freeav(av);
 }
@@ -101,15 +105,16 @@ void msenv(char **av)
 /**
  * uenv - unset environment builtin
  * @av: array
+ * @s: struct with filename and status
  *
  * Return: void
  */
-void uenv(char **av)
+void uenv(char **av, st *s)
 {
 	if (!av[1] || av[2])
-		print_err(av, ": Wrong number of argument\n");
+		print_err(av, ": Wrong number of argument\n", s);
 	else if (_unsetenv(av[1]) == 0)
-		print_err(av, ": failed to set enviroment\n");
+		print_err(av, ": failed to set enviroment\n", s);
 	if (av && *av)
 		freeav(av);
 }

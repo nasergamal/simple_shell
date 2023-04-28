@@ -27,11 +27,13 @@ int main(int ac __attribute__((unused)), char **av)
 int loop(char **av, char *buf)
 {
 	size_t bsize = 0;
-	int status = 0, att = isatty(STDIN_FILENO);
-	void (*e)(char **);
+	int att = isatty(STDIN_FILENO);
+	void (*e)(char **, st *);
 	ssize_t char_count = 0;
 	char **cav;
+	st s[] = { {0, NULL} };
 
+	s->fname = av[0];
 	signal(SIGINT, sighand);
 	while (char_count != EOF)
 	{
@@ -53,18 +55,18 @@ int loop(char **av, char *buf)
 		{
 			if ((_strcmp(av[0], "exit") && !(av[1])))
 				{	free(buf), buf = NULL, freeenv(), freeav(av);
-					exit(status); }
+					exit(s->status); }
 				if (_strcmp(av[0], "exit") && av[1])
-					free(buf), buf = NULL, status = 2;
-				e(av);
+					free(buf), buf = NULL, s->status = 2;
+				e(av, s);
 				continue; }
-		cav = sep(cav, &status); /* check for separator and execute based on it */
-		execute(cav, &status);
+		cav = sep(cav, s); /* check for separator and execute based on it */
+		execute(cav, s);
 		if (av && *av)
 			freeav(av); }
 	if (buf != NULL)
 		free(buf);
-	return (status); }
+	return (s->status); }
 
 /**
  * tokenize - tokenize inputs and add tokens to an array
@@ -116,12 +118,12 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 /**
  * sep - look for separators
  * @av: pointer to an array
- * @status: last execution status
+ * @s: struct with filename and status
  *
  * Return: av
  */
 
-char **sep(char **av, int *status)
+char **sep(char **av, st *s)
 {
 	int i, n = 0;
 
@@ -129,7 +131,7 @@ char **sep(char **av, int *status)
 	{
 		if (_strcmp(av[i], ";"))
 		{
-			n = conv2(av, status, n, i); }
+			n = conv2(av, s, n, i); }
 		else if (_strcmp(av[i], "#"))
 		{
 			free(av[i]), av[i] = '\0';
@@ -140,17 +142,17 @@ char **sep(char **av, int *status)
 			continue;
 		else if (_strcmp(av[i], "$$") || (_strcmp(av[i], "$?")))
 		{
-			conv(av, i, status); }
+			conv(av, i, s); }
 		else if (_strcmp(av[i], "$") && av[i][1])
 		{
-			conv(av, i, status); }
+			conv(av, i, s); }
 		else if (_strcmp(av[i], "&&") && av[i + 1])
 		{
-			n = logicalop(av, "&&", status, 0);
+			n = logicalop(av, "&&", s, 0);
 			break; }
 		else if (_strcmp(av[i], "||") && av[i + 1])
 		{
-			n = logicalop(av, "||", status, 1);
+			n = logicalop(av, "||", s, 1);
 			break; }
 	}
 	return (av + n);

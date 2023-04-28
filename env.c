@@ -151,7 +151,6 @@ void _initenv(void)
 
 /**
  * freeenv - free program environ
- *
  * Return: void
  */
 void freeenv(void)

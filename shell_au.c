@@ -3,12 +3,12 @@
 /**
  * execute - excute cmd with argument argv
  * @argv: pointer to array
- * @status: child pid excution status
+ * @s: struct with filename and status
  *
  * Return: void
  */
 
-void execute(char **argv, int *status)
+void execute(char **argv, st *s)
 {
 	char *cmd;
 	pid_t pid;
@@ -20,31 +20,31 @@ void execute(char **argv, int *status)
 	}
 	if (!(is_cmd(cmd))) /* check if argument is cmd else check in $PATH*/
 		cmd = check_cmd(cmd);
-	if  (is_cmd(cmd) && (access(cmd, F_OK) == 0))
+	if  ((is_cmd(cmd) && (_strcmp(cmd, "./") || (_strcmp(cmd, "/")))))
 		pid = fork();
 	else
 	{
-		print_err(argv, ": not found\n");
+		print_err(argv, ": not found\n", s);
 		free(cmd);
-		*status = 127;
+		s->status = 127;
 		return;
 	}
 	if (pid == -1)
-	{	*status = 1, print_err(argv, ": failed to fork\n"); }
+	{	s->status = 1, print_err(argv, ": failed to fork\n", s); }
 	else if (pid == 0)
 	{
 		if (execve(cmd, argv, environ) == -1)
 		{
-			print_err(argv, ": No such file or directory");
+			print_err(argv, ": No such file or directory", s);
 			free(cmd);
 			freeav(argv);
 			exit(98);
 		}
 	}
 	else
-		wait(status);
-	if (WIFEXITED(*status))
-		*status = WEXITSTATUS(*status);
+		wait(&(s->status));
+	if (WIFEXITED(s->status))
+		s->status = WEXITSTATUS(s->status);
 	free(cmd);
 }
 
@@ -112,7 +112,7 @@ int is_cmd(char *cmd)
  * Return: void
  */
 
-void (*buildin(char **av))(char **av)
+void (*buildin(char **av))(char **av, st *s)
 {
 	int i, n = 0;
 
