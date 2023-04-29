@@ -18,10 +18,11 @@ void execute(char **argv, st *s)
 	cmd = _strdup(argv[0]);
 	if (!cmd)
 		return;
-	if ((!(is_cmd(cmd) && (_strcmp(cmd, "./") ||
-			_strcmp(cmd, "../"))))) /* check if argument is cmd else check in $PATH*/
+	if (!(is_cmd(cmd) && (_strcmp(cmd, "./") ||
+			_strcmp(cmd, "../")))) /* check if argument is cmd else check in $PATH*/
 		cmd = check_cmd(cmd);
-	if  (is_cmd(cmd))
+	if  (is_cmd(cmd) && (_strcmp(cmd, ".") ||
+			_strcmp(cmd, "/")))
 		pid = fork();
 	else
 	{

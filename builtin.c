@@ -37,8 +37,12 @@ void exitf(char **av, st * s __attribute__((unused)))
 void cdir(char **av, st *s)
 {
 	int i = 1;
-	char cwd[1024];
+	char cwd[1024], *ermsg;
 
+	ermsg = malloc(sizeof(char) * (_strlen(av[1]) + 17));
+	if (ermsg != NULL)
+	{	_strcpy(ermsg, ": can't cd to ");
+		_strcat(ermsg, av[1]), _strcat(ermsg, "\n\0"); }
 	if (!(av[1]))
 	{
 		if (_getenv("HOME") != NULL)
@@ -61,7 +65,7 @@ void cdir(char **av, st *s)
 		i = chdir(av[1]);
 	if (i == -1)
 	{
-		print_err(av, ": can't cd to\n", s);
+		print_err(av, (ermsg ? ermsg : ": can't cd to\n"), s);
 	}
 	else
 	{
@@ -70,6 +74,7 @@ void cdir(char **av, st *s)
 	}
 	if (av && *av)
 		freeav(av);
+	free(ermsg);
 }
 /**
  * menv - print enviorn
