@@ -153,3 +153,23 @@ int conv2(char **av, st *s, int n, int i)
 	}
 	return (n);
 }
+
+/**
+ * rmcomment - remove comments from buffer
+ * @buf: buffer to be checked for comments
+ *
+ * Return: void
+ */
+void rmcomment(char *buf)
+{
+	int i = 0;
+
+	while (buf[i] != '\0')
+	{
+		if ((buf[i] == '#') && (!i || (buf[i - 1] == ' ')))
+		{	buf[i] = '\0';
+			break; }
+		i++;
+	}
+}
+

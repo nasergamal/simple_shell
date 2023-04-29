@@ -13,14 +13,15 @@ void execute(char **argv, st *s)
 	char *cmd;
 	pid_t pid;
 
+	if (!argv || !(*argv))
+	{	return; }
 	cmd = _strdup(argv[0]);
-	if (!argv || !argv[0] || !cmd)
-	{
+	if (!cmd)
 		return;
-	}
-	if (!(is_cmd(cmd))) /* check if argument is cmd else check in $PATH*/
+	if ((!(is_cmd(cmd) && (_strcmp(cmd, "./") ||
+			_strcmp(cmd, "../"))))) /* check if argument is cmd else check in $PATH*/
 		cmd = check_cmd(cmd);
-	if  ((is_cmd(cmd) && (_strcmp(cmd, "./") || (_strcmp(cmd, "/")))))
+	if  (is_cmd(cmd))
 		pid = fork();
 	else
 	{

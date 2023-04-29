@@ -83,6 +83,7 @@ char **tokenize(char **av, char *buf, ssize_t char_count)
 	char *bufc = NULL, *token;
 	const char *d = " \t\n";
 
+	rmcomment(buf);
 	bufc = malloc(sizeof(char) * (char_count + 1));
 	if (bufc == NULL)
 	{
@@ -132,12 +133,6 @@ char **sep(char **av, st *s)
 		if (_strcmp(av[i], ";"))
 		{
 			n = conv2(av, s, n, i); }
-		else if (_strcmp(av[i], "#"))
-		{
-			free(av[i]), av[i] = '\0';
-			for (i += 1; av[i] ; i++)
-				free(av[i]);
-			break; }
 		else if (_strcmp(av[i], "$") && !(av[i][1]))
 			continue;
 		else if (_strcmp(av[i], "$$") || (_strcmp(av[i], "$?")))

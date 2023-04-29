@@ -41,7 +41,10 @@ void cdir(char **av, st *s)
 
 	if (!(av[1]))
 	{
-		i = chdir(_getenv("HOME"));
+		if (_getenv("HOME") != NULL)
+			i = chdir(_getenv("HOME"));
+		else
+			i = chdir(_getenv("PWD"));
 	}
 	else if (_strcmp(av[1], "-"))
 	{
@@ -58,7 +61,7 @@ void cdir(char **av, st *s)
 		i = chdir(av[1]);
 	if (i == -1)
 	{
-		print_err(av, ": No such file or directory\n", s);
+		print_err(av, ": can't cd to\n", s);
 	}
 	else
 	{

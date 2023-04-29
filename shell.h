@@ -79,6 +79,7 @@ char *num_to_char(long int num);
 int logicalop(char **av, char *del, st *s, int mod);
 void conv(char **av, int i, st *s);
 int conv2(char **av, st *s, int n, int i);
+void rmcomment(char *buf);
 
 /* not implemented */
 ssize_t _tkline(char **lineptr, size_t *n);
